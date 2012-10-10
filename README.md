@@ -6,10 +6,9 @@
 1. 安装[Ruby 1.8.7](http://rubyinstaller.org/downloads)（安装时记得把tcl/tk支持选上）
 2. 安装[ActiveTcl](http://www.activestate.com/activetcl/downloads)
 3. 安装‘rqrcode_png’这个最主要的gem
-3. 如果需要水印功能（就是在二维码上），还要安装‘rmagick’这个gem和ImageMagick这个图形处理库。
-4. 执行QRCoder_Maker.rb
-5. 或者不搭建环境，直接执行QRCoder_Maker.exe(如果需要水印，ImageMagick也是必须的)
 
+4. 执行QRCoder_Maker.rb
+5. 或者不搭建环境，直接执行QRCoder_Maker.exe
 
 ###不是计划的计划
 

@@ -1,17 +1,13 @@
 require 'rubygems'
 require 'tk'
 require 'rqrcode_png'
-require 'RMagick'
 require 'csv'
-
+require 'iconv'
 $type = TkVariable.new
 $type.value = '1'
-$needwatermark = TkVariable.new
-$needwatermark.value ='0'
+
 def create(content,sizes,path)
-  #content = '周子予'#encodingsource.string #获取需要编码的内容
   @width = sizes #获取二维码的宽高
-  #path = '/Users/maclion/Desktop'#choose_fold
   case $type.value
     when '1'
       normal(content,path)
@@ -33,10 +29,9 @@ end
 def normal(content,path)
   $all = CSV.parse(content).length
   CSV.parse(content).each do |i|
-    qr = RQRCode::QRCode.new(i.join(","),:size => 6,:level => :l)
+    qr = RQRCode::QRCode.new(Iconv.conv('utf-8','GBK',i.join(",")),:size => 6,:level => :l)
     png = qr.to_img
     png.resize(@width,@width).save(path+"/#{i[0]}.png")
-    watermark(path,"#{i[0]}") if $needwatermark.value == "1"
   end
 end
   
@@ -47,27 +42,12 @@ def vcard(content,path)
     s = (0...info.length).map do |i|
       fieldnames[i] + ":" + info[i]
     end.join("\n")
-    qr = RQRCode::QRCode.new("BEGIN:VCARD\nVERSION:2.1\n"+s+"\nEND:VCARD",:size => 10,:level => :l)
+    qr = RQRCode::QRCode.new(Iconv.conv('utf-8','GBK',"BEGIN:VCARD\nVERSION:2.1\n"+s+"\nEND:VCARD"),:size => 10,:level => :l)
     png = qr.to_img
     png.resize(@width,@width).save(path+"/#{info[0]}#{info[3]}.png")
-    watermark(path,"#{info[0]}#{info[3]}") if $needwatermark.value == "1"
   end
 end
     
-def watermark(path,info)
-  Dir.mkdir(path+'/watermark') if !File.directory?(path+'/watermark')
-  img=Magick::Image.read(path+'/'+info+'.png').first
-  copyright = Magick::Draw.new
-  a = @width/15
-  copyright.annotate(img,0,0,a,0,"#{info}") do
-    self.font='msyh.ttf'
-    self.pointsize = a
-    self.gravity = Magick::SouthEastGravity
-    self.stroke = "none"
-  end
-  img.write(path+"/watermark/#{info}_marked.png")
-end
-
 def valid123(number)
   if number.match(/^[^0]\d+$/)
     return true
@@ -85,7 +65,7 @@ root = TkRoot.new do
 end
 
 TkLabel.new(root){
-  text 'Contents need to encoding:'
+  text 'Contents need to encode:'
   anchor 'w'
   pack :side=>'top',:padx => '20', :fill => 'both'
   font "verdana 14"
@@ -121,22 +101,13 @@ TkButton.new(root){
   command{
     if valid123(sizes.value)
       path = Tk.chooseDirectory
-      if path != ''
-        create(content.value,sizes.to_i,path) if path !=''
-        Tk::messageBox :message => "Congretulation! all QRCodes are completed ", :title => 'Completed!'
-      end
+      create(content.value,sizes.to_i,path) if path != ''
+      Tk::messageBox :message => "Congretulation! all QRCodes are completed ", :title => 'Completed!'
     else
       Tk::messageBox :message => 'Please input correct size', :title =>'Error！'
     end
   }
 }#.grid('row'=>8,'column'=>2)
-
-TkCheckButton.new(root){
-  bg background
-  text "Need WaterMark"
-  variable $needwatermark
-  pack :side => 'bottom'
-}#.grid('row'=>7,'column'=>1)
 
 f1 = TkFrame.new {
   pack :side => 'bottom',:fill => 'both',:padx => '20'
