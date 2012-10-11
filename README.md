@@ -8,7 +8,8 @@
 3. 安装‘rqrcode_png’这个最主要的gem
 
 4. 执行QRCoder_Maker.rb
-5. 或者不搭建环境，直接执行QRCoder_Maker.exe
+5. 要编译成exe文件，请先安装ocra gem install ocra，然后执行ocra [rb file] [ruby/tk path] --add-all-core --windows --no-autoload --gem-full
+6. 或者不搭建环境，直接执行QRCoder_Maker.exe
 
 ###不是计划的计划
 
